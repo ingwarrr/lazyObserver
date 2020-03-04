@@ -1,10 +1,24 @@
-# Lazy observer
+# Lazy image loader
 IntersectionObserver-api based lazyloader for images
+Polyfill for old browsers https://github.com/w3c/IntersectionObserver/tree/master/polyfill
+# Instalation
+**Via <script>
+```
+  <script src="./pathToLoader/index.js">
+```
+
+**Via require
 # Methods
-**Reload** - manually reload target images
+**.refresh()** - manually reload target images
 # Paramenetrs:
 * target image classname - (**str**: css class selector)
 * options - (**obj**)
+**.onLoad(img)** - callback on succesfully loaded image
+# Paramenetrs:
+* callback - (**function**)
+**.onError(img)** - callback on error loaded image
+# Paramenetrs:
+* callback - (**function**)
 # Options
 All native options of IntersectionObserver API available as is. You can check documentation here: https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
 
