@@ -1,48 +1,67 @@
-class LazyLoader{
-  constructor(className = 'lazyload', observerOptions = {}){
+/* eslint-disable class-methods-use-this */
+class ImageLazyLoader {
+  constructor(observerOptions = {}) {
     this.observerOptions = {
-      delay: 200,
-      threshold: .7,
-      wait: 400,
+      delay: 500,
+      threshold: 0.7,
+      wait: 200,
+      className: 'lazyload',
       ...observerOptions,
     };
-    this.className = className;
-    this.targets = [...document.querySelectorAll(`.${this.className}`)];
+    this.targets = [...document.querySelectorAll(`.${this.observerOptions.className}`)];
     this.init();
     this.refreshOnEvent(this.observerOptions.refreshEvent);
   }
-  
-  init() {
-    function debounce (fn, wait) {
-      let t = 0;
-      return function() {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(this, arguments), wait);
-        return t;
-      }
+  onLoad(image) {
+    if (this.observerOptions.onLoad) {
+      this.observerOptions.onLoad(image);
     }
-    
+  }
+
+  onError(image) {
+    if (this.observerOptions.onError) {
+      this.observerOptions.onError(image);
+    }
+  }
+
+  init() {
+    function debounce(fn, wait) {
+      let t = 0;
+      return function (args) {
+        clearTimeout(t);
+        t = setTimeout(() => fn.apply(this, args), wait);
+        return t;
+      };
+    }
+
     const intersectionHandler = (entry, observer) => {
-      const lazy = entry.target;
-      const attrs = Object.keys(lazy.dataset);
-      if (attrs.includes('src', 'srcset')) {
-        lazy[attrs[0]] = lazy.dataset[attrs[0]];
-        lazy.classList.remove(this.className);
+      const image = entry.target;
+      const source = Object.keys(image.dataset).find(el => (el === 'src') || (el === 'srcset'));
+      if (source) {
+        image[source] = image.dataset[source];
+        image.onload = () => this.onLoad(image);
+        image.onerror = () => this.onError(image);
+        image.classList.remove(this.observerOptions.className);
+        image.classList.remove(`${this.observerOptions.className}Placeholder`);
+        image.classList.add(`${this.observerOptions.className}Loaded`);
       }
-      observer.unobserve(lazy);
+      observer.unobserve(image);
     };
-    
-    const cb = (entries, observer) => {
-      entries.forEach(entry => {
+
+    const entryHandler = (entries, observer) => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const debouncedHandler = debounce(() => intersectionHandler(entry, observer), this.observerOptions.wait);
+          const debouncedHandler = debounce(
+            () => intersectionHandler(entry, observer),
+            this.observerOptions.wait,
+          );
           debouncedHandler();
         }
       });
     };
-    
-    const observer = new IntersectionObserver(cb, this.observerOptions); 
-    this.targets.forEach(target => observer.observe(target))
+
+    const observer = new IntersectionObserver(entryHandler, this.observerOptions);
+    this.targets.forEach(target => observer.observe(target));
   }
 
   refreshOnEvent(refreshEvent) {
@@ -52,9 +71,8 @@ class LazyLoader{
   }
 
   refresh() {
-    this.targets = [...document.querySelectorAll(`.${this.className}`)];
+    this.targets = [...document.querySelectorAll(`.${this.observerOptions.className}`)];
     this.init();
   }
 }
-
-const lazyloadObserver = new LazyLoader('lazyload', {refreshEvent: 'ajaxloaded'});
+module.exports = ImageLazyLoader;
