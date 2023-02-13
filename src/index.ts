@@ -1,4 +1,13 @@
 /* eslint-disable class-methods-use-this */
+function debounce(fn, wait) {
+  let t = 0;
+  return function (args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), wait);
+    return t;
+  };
+}
+
 class ImageLazyLoader {
   constructor(observerOptions = {}) {
     this.observerOptions = {
@@ -25,14 +34,7 @@ class ImageLazyLoader {
   }
 
   init() {
-    function debounce(fn, wait) {
-      let t = 0;
-      return function (args) {
-        clearTimeout(t);
-        t = setTimeout(() => fn.apply(this, args), wait);
-        return t;
-      };
-    }
+    
 
     const intersectionHandler = (entry, observer) => {
       const image = entry.target;
@@ -75,4 +77,4 @@ class ImageLazyLoader {
     this.init();
   }
 }
-module.exports = ImageLazyLoader;
+

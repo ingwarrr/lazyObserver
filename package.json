@@ -1,0 +1,16 @@
+{
+    "name": "LazyObserver",
+    "version": "0.0.1",
+    "description": "Image lazy-loader based on IntersectionObserver api",
+    "main": "index.ts",
+    "repository": "git@github.com:ingwarrr/lazyObserver.git",
+    "author": "i.kulakov <ingwarrr.core@yandex.ru>",
+    "license": "MIT",
+    "private": false,
+    "scripts": {
+        "build": "tsc --build"
+    },
+    "devDependencies": {
+        "typescript": "^4.9.5"
+    }
+}
